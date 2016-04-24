@@ -42,9 +42,11 @@ request.onload = () => {
 		source.connect(audioCtx.destination);
 
 	});
+	
+	request.send();
+	source.start(0);
 };
 
 
-request.send();
 
-source.start(0);
+
