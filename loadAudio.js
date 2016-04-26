@@ -17,7 +17,7 @@ request.responseType = 'arraybuffer';
 // prepare and connect an analyser node for frequency visualization data
 analyser = audioCtx.createAnalyser();
 analyser.fftSize = 2048;
-let bufferLength = analyser.frequencyBinCount;
+let bufferLength = analyser.fftSize;
 let dataArray = new Uint8Array(bufferLength);
 analyser.getByteTimeDomainData(dataArray);
 
@@ -37,24 +37,26 @@ getData = () => {
 			source.buffer = buffer;
 
 			// connect the buffer to the destination node
-			source.connect(audioCtx.destination);
-
+			source.connect(analyser);
+			analyser.connect(audioCtx.destination);
 			
 		});
 	};
 	request.send();
 }
 
-var c = document.getElementById("myCanvas");
-var canvasCtx = c.getContext("2d");
+let c = document.getElementById("myCanvas");
+let canvasCtx = c.getContext("2d");
+
+let drawVisual;
 
 draw = () => {
   WIDTH = canvasCtx.width;
   HEIGHT = canvasCtx.height;
 
-  let drawVisual = requestAnimationFrame(draw);
+  drawVisual = requestAnimationFrame(draw);
 
-  canvasCtx.fillStyle = 'rgb(3, 4, 5)';
+  canvasCtx.fillStyle = 'rgb(d,d,d)';
   canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
   var barWidth = (WIDTH / bufferLength) * 2.5;
@@ -64,7 +66,7 @@ draw = () => {
   for(var i = 0; i < bufferLength; i++) {
     barHeight = dataArray[i];
 
-    canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+    canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',0,0)';
     canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight/2);
 
     x += barWidth + 1;
@@ -74,3 +76,6 @@ draw = () => {
 getData();
 draw();
 source.start(0);
+
+
+
